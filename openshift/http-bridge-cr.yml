@@ -1,0 +1,28 @@
+apiVersion: kafka.strimzi.io/v1alpha1
+kind: KafkaBridge
+metadata:
+  name: lab-bridge
+  labels:
+    app: lab-bridge
+spec:
+  replicas: 1
+  bootstrapServers: kafka-cluster-kafka-bootstrap:9093
+  http:
+    port: 8080
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 512Mi
+      cpu: 250m
+  tls:
+    trustedCertificates:
+    - secretName: kafka-cluster-cluster-ca-cert
+      certificate: ca.crt
+  authentication:
+    type: tls
+    certificateAndKey:
+      secretName: bridge-user
+      certificate: user.crt
+      key: user.key
