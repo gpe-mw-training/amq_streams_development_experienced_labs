@@ -1,0 +1,36 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  name: kafka-connector-source
+objects:
+- apiVersion: kafka.strimzi.io/v1alpha1
+  kind: KafkaConnector
+  metadata:
+    name: debezium-source-connector
+    labels:
+      strimzi.io/cluster: ${KAFKA_CONNECT_NAME}
+  spec:
+    class: 'io.debezium.connector.mysql.MySqlConnector'
+    tasksMax: 1
+    config:
+      database.hostname: '${DATABASE_HOST_NAME}'
+      database.port: '3306'
+      database.user: '${DATABASE_USER}'
+      database.password: '${DATABASE_PASSWORD}'
+      database.server.id: '184054'
+      database.allowPublicKeyRetrieval: 'true'
+      database.server.name: 'dbserver1'
+      database.whitelist: 'inventory'
+      database.history.kafka.bootstrap.servers: '${KAFKA_BOOTSTRAP_SERVERS}'
+      database.history.kafka.topic: 'schema-changes.inventory'
+      transforms: 'route'
+      transforms.route.type: 'org.apache.kafka.connect.transforms.RegexRouter'
+      transforms.route.regex: '([^.]+)\.([^.]+)\.([^.]+)'
+      transforms.route.replacement: '$3'    
+parameters:
+- name: KAFKA_CONNECT_NAME
+  value: kafka-connect
+- name: DATABASE_HOST_NAME
+- name: DATABASE_USER
+- name: DATABASE_PASSWORD
+- name: KAFKA_BOOTSTRAP_SERVERS
